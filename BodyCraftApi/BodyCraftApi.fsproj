@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Data/Food.fs" />
+    <Compile Include="Repositories/FoodRepository.fs" />
+    <Compile Include="Controllers/FoodController.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+</Project>
