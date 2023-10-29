@@ -1,10 +1,9 @@
 ﻿CREATE TABLE `BodyCraftApiDb`.Foods (
 	Id INT UNSIGNED auto_increment NOT NULL,
 	Name varchar(100) NULL,
-	QuantityInGrams int NULL,
-	Protein float NULL,
-	Carb float NULL,
-	Fat float NULL,
+	ProteinPerGram float NULL,
+	CarbPerGram float NULL,
+	FatPerGram float NULL,
 	CONSTRAINT Foods_PK PRIMARY KEY (Id)
 )
 ENGINE=InnoDB

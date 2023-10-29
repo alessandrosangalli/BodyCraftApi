@@ -3,9 +3,18 @@
     <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Data/WithId.fs" />
     <Compile Include="Data/Food.fs" />
+    <Compile Include="Data/Meal.fs" />
+    <Compile Include="Repositories/Types.fs" />
+    <Compile Include="Repositories/MealRepository.fs" />
     <Compile Include="Repositories/FoodRepository.fs" />
     <Compile Include="Controllers/FoodController.fs" />
     <Compile Include="Program.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MySqlConnector" Version="2.2.7" />
+    <PackageReference Include="FSharp.Data" Version="6.3.0" />
+    <PackageReference Include="SQLProvider" Version="1.3.18" />
   </ItemGroup>
 </Project>

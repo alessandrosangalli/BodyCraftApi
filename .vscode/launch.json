@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/bin/Debug/net7.0/BodyCraftApi.dll",
+            "program": "${workspaceFolder}/BodyCraftApi/bin/Debug/net7.0/BodyCraftApi.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
