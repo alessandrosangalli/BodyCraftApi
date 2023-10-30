@@ -3,13 +3,13 @@
     <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Data/WithId.fs" />
     <Compile Include="Data/Food.fs" />
     <Compile Include="Data/Meal.fs" />
     <Compile Include="Repositories/Types.fs" />
     <Compile Include="Repositories/MealRepository.fs" />
     <Compile Include="Repositories/FoodRepository.fs" />
     <Compile Include="Controllers/FoodController.fs" />
+    <Compile Include="Controllers/MealController.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

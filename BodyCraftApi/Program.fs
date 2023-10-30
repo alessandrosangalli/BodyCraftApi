@@ -26,6 +26,7 @@ module Program =
         let builder = WebApplication.CreateBuilder(args)
 
         builder.Services.AddSingleton<FoodRepository>()
+        builder.Services.AddSingleton<MealRepository>()
         builder.Services.AddControllers()
 
         let app = builder.Build()

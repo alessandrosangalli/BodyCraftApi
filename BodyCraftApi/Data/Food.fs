@@ -3,13 +3,15 @@ namespace BodyCraftApi.Data
 open System.Data
 
 type Food =
-    { Name: string
+    { Id: option<int>
+      Name: string
       ProteinPerGram: float32
       CarbPerGram: float32
       FatPerGram: float32 }
 
     static member fromDataReader(reader: IDataReader) =
-        { Name = reader.GetString 1
+        { Id = Some(reader.GetInt32 0)
+          Name = reader.GetString 1
           ProteinPerGram = reader.GetFloat 2
           CarbPerGram = reader.GetFloat 3
           FatPerGram = reader.GetFloat 4 }
@@ -20,7 +22,4 @@ type Food =
                 yield Food.fromDataReader reader
         }
 
-
-type FoodWithId =
-    | Food
-    | WithId
+type FoodIdWithQuantity = { Id: int; QuantityInGrams: float }
