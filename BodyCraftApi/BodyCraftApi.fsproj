@@ -5,7 +5,9 @@
   <ItemGroup>
     <Compile Include="Data/Food.fs" />
     <Compile Include="Data/Meal.fs" />
+    <Compile Include="Data/FoodMeals.fs" />
     <Compile Include="Repositories/Types.fs" />
+    <Compile Include="Repositories/Repository.fs" />
     <Compile Include="Repositories/MealRepository.fs" />
     <Compile Include="Repositories/FoodRepository.fs" />
     <Compile Include="Controllers/FoodController.fs" />

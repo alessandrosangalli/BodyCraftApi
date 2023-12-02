@@ -5,7 +5,9 @@ open BodyCraftApi.Repositories
 open System
 
 
-type MealFoodRequest = { FoodId: int; QuantityInGrams: float }
+type MealFoodRequest =
+    { FoodId: int
+      QuantityInGrams: float32 }
 
 type MealRequest =
     { Time: string
@@ -43,6 +45,21 @@ type MealController(mealRepository: MealRepository, foodRepository: FoodReposito
             match httpResult with
             | :? OkObjectResult -> this.AddMeal(mealRequest)
             | _ -> ()
+
+            return httpResult
+        }
+
+    [<Route("{id}")>]
+    [<HttpGet>]
+    member _.Get([<FromRoute>] id) =
+        task {
+            let result = mealRepository.GetById(id)
+
+            let httpResult =
+                if result.IsSome then
+                    this.Ok(result) :> IActionResult
+                else
+                    this.NotFound() :> IActionResult
 
             return httpResult
         }

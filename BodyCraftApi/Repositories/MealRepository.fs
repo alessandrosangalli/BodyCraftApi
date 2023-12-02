@@ -2,51 +2,51 @@ namespace BodyCraftApi.Repositories
 
 open BodyCraftApi.Data
 open MySqlConnector
-open System.Data
-open ProvidedTypes
 open System
 
-type AddMealDtoFood = { FoodId: int; QuantityInGrams: float }
+type AddMealDtoFood =
+    { FoodId: int
+      QuantityInGrams: float32 }
 
 type AddMealDto =
     { Time: TimeSpan
       Foods: AddMealDtoFood[] }
 
 type MealRepository() as this =
-    member private _.OpenIfConnectionIsClosed(connection: MySqlConnection) =
-        if connection.State = ConnectionState.Closed then
-            connection.Open()
+    inherit Repository()
 
-    member private _.CloseIfConnectionIsOpen(connection: MySqlConnection) =
-        if connection.State = ConnectionState.Open then
-            connection.Close()
+    member private _.MapFoodMealToFoodIdWithQuantity(foodMeal: FoodMeal) : FoodIdWithQuantity =
+        { Id = foodMeal.FoodId
+          QuantityInGrams = foodMeal.QuantityInGrams }
 
-    member private _.GetByParamInUniqueConnection<'ParamType>(param: 'ParamType, f) =
-        let connection = connectionFactory
-        this.OpenIfConnectionIsClosed(connection)
-
-        let result = f (param, connection)
-
-        this.CloseIfConnectionIsOpen(connection)
-
-        result
-
-    member private _.PersistInUniqueConnection<'PersistType>(persistType: 'PersistType, f) =
-        let connection = connectionFactory
-        this.OpenIfConnectionIsClosed(connection)
-
-        f (persistType, connection)
-
-        this.CloseIfConnectionIsOpen(connection)
-
-    member private _.InternalGetById(id: int, connection: MySqlConnection) =
+    member private _.InternalGetById(id: int, connection: MySqlConnection) : option<Meal> =
         let command = new MySqlCommand($"SELECT * FROM Meals WHERE id = {id};", connection)
         let reader = command.ExecuteReader()
+        let meal = reader |> Meal.asSeq |> Seq.tryHead
 
-        reader |> Meal.asSeq |> Seq.tryHead
+        connection.Close()
+        connection.Open()
+
+        if (meal.IsNone) then
+            None
+        else
+            let commandFoods =
+                new MySqlCommand($"SELECT * FROM FoodsMeals WHERE MealId = {id};", connection)
+
+            let foodIdWithQuantity =
+                commandFoods.ExecuteReader()
+                |> FoodMeal.asSeq
+                |> Array.ofSeq
+                |> Array.map this.MapFoodMealToFoodIdWithQuantity
+
+            Some(
+                { Id = Some(id)
+                  FoodIdWithQuantity = foodIdWithQuantity
+                  Time = meal.Value.Time }
+            )
 
     member _.InternalAddMeal(meal: Meal, connection: MySqlConnection) =
-        let mealTimeAsString = meal.Time.ToString("hh\\:mm\\:ss")
+        let mealTimeAsString = meal.Time.ToString()
 
         let command =
             new MySqlCommand($"INSERT INTO Meals (Time) VALUES ('{mealTimeAsString}');", connection)
@@ -58,7 +58,7 @@ type MealRepository() as this =
         connection.Close()
         connection.Open()
 
-        for mealFood in meal.FoodWithQuantity do
+        for mealFood in meal.FoodIdWithQuantity do
             let command =
                 new MySqlCommand(
                     $"INSERT INTO FoodsMeals (MealId, FoodId, QuantityInGrams) VALUES ({lastMealId}, {mealFood.Id}, {mealFood.QuantityInGrams});",
@@ -67,16 +67,10 @@ type MealRepository() as this =
 
             command.ExecuteNonQuery() |> ignore
 
-    member private _.GetLastInsertId(connection: MySqlConnection) : int64 =
-        let command = new MySqlCommand("SELECT last_insert_id();", connection)
-        let reader = command.ExecuteReader()
-        reader.Read() |> ignore
-        reader.GetInt64 0
-
     member _.AddMeal(addMealDto: AddMealDto) =
         let meal: Meal =
             { Id = None
-              FoodWithQuantity =
+              FoodIdWithQuantity =
                 addMealDto.Foods
                 |> Array.map (fun food ->
                     { Id = food.FoodId
@@ -86,4 +80,4 @@ type MealRepository() as this =
         this.PersistInUniqueConnection<Meal>(meal, this.InternalAddMeal)
 
     member _.GetById(id: int) =
-        this.GetByParamInUniqueConnection<int>(id, this.InternalGetById)
+        this.GetByParamInUniqueConnection<int, Meal>(id, this.InternalGetById)

@@ -3,20 +3,18 @@ namespace BodyCraftApi.Data
 open System
 open System.Data
 
-type Quantity = { QuantityInGrams: float }
-
 type Meal =
     { Id: option<int>
-      FoodWithQuantity: FoodIdWithQuantity[]
+      FoodIdWithQuantity: FoodIdWithQuantity[]
       Time: TimeSpan }
 
     static member fromDataReader(reader: IDataReader) : Meal =
         { Id = Some(reader.GetInt32 0)
-          FoodWithQuantity = Array.empty
-          Time = reader.GetString 1 |> TimeSpan.Parse }
+          FoodIdWithQuantity = Array.empty
+          Time = reader.GetValue 1 |> unbox<TimeSpan> }
 
     static member asSeq(reader: IDataReader) =
         seq {
             while reader.Read() do
-                yield Food.fromDataReader reader
+                yield Meal.fromDataReader reader
         }
